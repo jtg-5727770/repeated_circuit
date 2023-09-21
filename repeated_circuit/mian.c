@@ -21,6 +21,7 @@ TreeNode n10 = { 7, &n9, &n8, 0 };
 TreeNode n11 = { 1, &n5, &n10, 0 };
 TreeNode* root = &n11;
 
+//중위 후속자를 찾는 함수 
 TreeNode* find_successor(TreeNode* p)
 {
 	// q는 p의 오른쪽 포인터
@@ -48,18 +49,19 @@ void thread_inorder(TreeNode* t)
 		q = find_successor(q); // 후속자 함수 호출
 	} while (q);			// NULL이 아니면
 }
+
 //부모 노드 찾는 함수
 TreeNode* parent(TreeNode* child) {
 	TreeNode* q;
 	q = child;
 	while (q->left)
 		q = q->left; // 가장 왼쪽 노드로 간다.
-	if (q->right->left == q) {
-		q = q->right;
+	if (q->right->left == q) {  //스레드의 왼쪽 자식이 자신인경우
+		q = q->right;           //스레드한 노드를 출력
 		printf("%d\n", q->data);
 	}
-	else {
-		q = q->right->left;
+	else {                      //스레드의 왼쪽자식이 자신이 아닌경우
+		q = q->right->left;     //왼쪽으로 이동후 출력
 		printf("%d\n", q->data);
 	}
 }
