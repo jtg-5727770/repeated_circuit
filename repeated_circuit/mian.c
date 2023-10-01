@@ -206,8 +206,11 @@ TreeNode* delete_node2(TreeNode* node, int key)
 }
 
 // 중위 순회 함수 (트리의 노드 값을 중위 순서로 출력)
+int inorder_count = 0;
 void inorder(TreeNode* root) {
+
     if (root) {
+        inorder_count++;
         inorder(root->left);   // 왼쪽 서브트리 순회
         printf("%d ", root->key);  // 노드 방문
         inorder(root->right);  // 오른쪽 서브트리 순회
@@ -292,11 +295,15 @@ int main()
                 break;
 
             case 't':
+                printf("중위 순회\n"); 
+                inorder_count = 0;
                 inorder(root);
+                printf("\n");
+                printf("방문한 노드의 수: %d", inorder_count);
                 printf("\n\n");
                 break;
 
-            case 'l':
+            case 'I':
                 printf("삽입할 값 입력: ");
                 scanf_s("%d", &k);
                 insert_count = 0;
