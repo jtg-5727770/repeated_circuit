@@ -1,4 +1,4 @@
-#실행결과
+#실행결과\n
 #qsort
 ![](./result1.png)
 #minheap
