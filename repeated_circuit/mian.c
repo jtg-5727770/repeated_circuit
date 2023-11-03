@@ -202,24 +202,24 @@ void dfs_mat(GraphType* g, int v, int target) {
 			}
 		}
 
-
+		//연결된 노드중 미방문 모드가 없으면
 		if (!found) {
-			pop(&stack);
-			while (!stack_is_empty(&stack)) {
+			pop(&stack); //마지막에 푸시한 값이 중복출력되는걸 방지하기위해 하나를 빼준다
+			while (!stack_is_empty(&stack)) { // 하나씩 pop하기
 				int popped = pop(&stack);
 				count++;
 				printf("%d ", popped);
 
-				int shouldBreak = 0;
+				int shouldBreak = 0; //브레이크를 위한 변수
 				int current1 = stack.data[stack.top];
-				for (int w = 0; w < g->n; w++) {
+				for (int w = 0; w < g->n; w++) { //pop한 노드에서 이어진 노드중 방문안한 노드 찾기
 					if (g->adj_mat[current1][w] && !visited[w]) {
-						shouldBreak = 1;
+						shouldBreak = 1; //방문안한 노드 찾음
 						break;
 					}
 				}
-
-				if (shouldBreak == 1) {
+				//방문안한 노드를 찾았으면 하나를 더 pop하고 while문 종료
+				if (shouldBreak == 1) { 
 					int popped1 = pop(&stack);
 					count++;
 					printf("%d ", popped1);
