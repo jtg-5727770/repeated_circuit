@@ -37,14 +37,14 @@ struct Edge {			// 간선을 나타내는 구조체
 
 typedef struct GraphType {
 	int n;	// 간선의 개수
-	int nvertex; //정점의 개수
+	
 	struct Edge edges[2 * MAX_VERTICES];
 } GraphType;
 
 // 그래프 초기화 
 void graph_init(GraphType* g)
 {
-	g->n = g->nvertex = 0;
+	g->n = g->n = 0;
 	for (int i = 0; i < 2 * MAX_VERTICES; i++) {
 		g->edges[i].start = 0;
 		g->edges[i].end = 0;
@@ -74,12 +74,12 @@ void qsort_kruskal(GraphType* g)
 	int uset, vset;			// 정점 u와 정점 v의 집합 번호
 	struct Edge e;
 
-	set_init(g->nvertex);				// 집합 초기화
+	set_init(g->n);				// 집합 초기화
 	qsort(g->edges, g->n, sizeof(struct Edge), compare);
 
 	printf("qsort를 이용한 크루스칼 최소 신장 트리 알고리즘 \n");
 	int i = 0;
-	while (edge_accepted < (g->nvertex - 1))	// 간선의 수 < (n-1)
+	while (edge_accepted < (g->n - 1))	// 간선의 수 < (n-1)
 	{
 		e = g->edges[i];
 		uset = set_find(e.start);		// 정점 u의 집합 번호 
@@ -146,7 +146,7 @@ void minheap_kruskal(GraphType* g) {
 	struct Edge minHeap[2*MAX_VERTICES];
 	int minHeapSize = 0;
 
-	set_init(g->nvertex);
+	set_init(g->n);
 	for (int i = 0; i < g->n; i++) {
 		minHeap[minHeapSize++] = g->edges[i];
 	}
@@ -171,8 +171,7 @@ int main(void)
 	GraphType* g;
 	g = (GraphType*)malloc(sizeof(GraphType));
 	graph_init(g);
-
-	g->nvertex = 11;
+	g->n = 11;
 	insert_edge(g, 1, 2, 3);
 	insert_edge(g, 1, 6, 11);
 	insert_edge(g, 1, 7, 12);
@@ -194,8 +193,8 @@ int main(void)
 	insert_edge(g, 8, 10, 15);
 	insert_edge(g, 9, 10, 10);
 
-	qsort_kruskal(g);
-	free(g);
+	//qsort_kruskal(g);
+	//free(g);
 
 	minheap_kruskal(g);
 	free(g);
