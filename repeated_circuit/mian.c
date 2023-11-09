@@ -11,10 +11,13 @@
 
 int distance[MAX_VERTICES]; // 시작정점으로부터의 최단경로 거리 
 int found[MAX_VERTICES];		// 방문한 정점 표시 
-int found_list[MAX_VERTICES];  // 탐색 성공 순서를 저장할 리스트
-int found_list1[MAX_VERTICES];
-int j = 0;
-int j1 = 0;
+
+int mat[MAX_VERTICES];  // 배열방식 탐색 성공 순서를 저장할 리스트
+int list[MAX_VERTICES]; // 리스트방식 탐색 성공 순서를 저장할 리스트
+
+int mat_j = 0;    //배열방식 리스트 인댁스 
+int list_j = 0;   //리스트방식 리스트 인댁스 
+
 // 인접 배열방식 그래프
 typedef struct GraphType {
 	int n;	// 정점의 개수
@@ -32,8 +35,8 @@ int choose(int distance[], int n, int found[])
 			min = distance[i];
 			minpos = i;
 		}
-	found_list[j] = minpos + 1;
-	j++;
+	mat[mat_j] = minpos + 1;
+	mat_j++;
 	return minpos; // 최단 거리를 가진 정점의 인덱스 반환
 }
 
@@ -65,8 +68,8 @@ void shortest_path(Mat_GraphType* g, int start)
 	}
 	found[start] = TRUE;    // 시작 정점 방문 표시 
 	distance[start] = 0;      // 시작 정점 거리 0
-	found_list[j] = start + 1;
-	j++;
+	mat[mat_j] = start + 1;
+	mat_j++;
 	for (i = 0; i < g->n - 1; i++) {
 		print_status(g);
 		u = choose(distance, g->n, found); // min값 확인
@@ -81,7 +84,7 @@ void shortest_path(Mat_GraphType* g, int start)
 		
 	}
 	for(int j=0; j<g->n;j++)
-		printf("%d ", found_list[j]);
+		printf("%d ", mat[j]);
 	
 }
 // 간선을 나타내는 구조체
@@ -120,13 +123,13 @@ void list_shortest_path(List_GraphType* g, int start) {
 			current = current->next;
 		}
 		found[u] = TRUE;
-		found_list1[j1] = u + 1;
-		j1++;
+		list[list_j] = u + 1;
+		list_j++;
 		print_status(g);
 	}
 
 	for (int j = 0; j < g->n; j++)
-		printf("%d ", found_list1[j]);
+		printf("%d ", list[j]);
 }
 
 // 그래프 초기화 함수
@@ -162,8 +165,8 @@ int main(void)
 	{ INF, INF, 5, 14, INF, INF, 13, 0, INF, 15},
 	{ INF, INF, INF, INF, 18, INF, INF,INF, 0, 10},
 	{ INF, INF, INF, 16, INF, INF, INF, 15, 10, 0}} };
-	//shortest_path(&g, 0);
-	
+	shortest_path(&g, 0);
+	printf("\n");
 	List_GraphType g1;
 	init_graph(&g1, 10);
 
