@@ -17,12 +17,6 @@ int list[MAX_VERTICES]; // 리스트방식 탐색 성공 순서를 저장할 리스트
 int mat_j = 0;    //배열방식 리스트 인댁스 
 int list_j = 0;   //리스트방식 리스트 인댁스 
 
-// 인접 배열방식 그래프
-typedef struct GraphType {
-	int n;	// 정점의 개수
-	int weight[MAX_VERTICES][MAX_VERTICES];
-} Mat_GraphType;
-
 // 간선을 나타내는 구조체
 typedef struct EdgeNode {
 	int dest; // 목적지 정점
@@ -36,8 +30,14 @@ typedef struct GraphType1 {
 	EdgeNode* adj_list[MAX_VERTICES]; // 각 정점의 인접 리스트를 나타내는 배열
 } List_GraphType;
 
+// 인접 배열방식 그래프
+typedef struct GraphType {
+	int n;	// 정점의 개수
+	int weight[MAX_VERTICES][MAX_VERTICES];
+} Mat_GraphType;
+
 // 탐색하며 min값 확인
-int mat_choose(int distance[], int n, int found[]) {
+int choose(int distance[], int n, int found[]) {
 	int i, min, minpos;
 	min = INT_MAX;    // 현재까지의 최소 거리를 무한대로 초기화
 	minpos = -1;
@@ -54,7 +54,8 @@ int mat_choose(int distance[], int n, int found[]) {
 
 	return minpos;  // 최단 거리를 가진 정점의 인덱스 반환
 }
-int list_choose(int distance[], int n, int found[]) {
+// 리스트 방식 choose
+int choose1(int distance[], int n, int found[]) {
 	int i, min, minpos;
 	min = INT_MAX;    // 현재까지의 최소 거리를 무한대로 초기화
 	minpos = -1;
@@ -68,7 +69,7 @@ int list_choose(int distance[], int n, int found[]) {
 
 	return minpos;  // 최단 거리를 가진 정점의 인덱스 반환
 }
-
+// 배열방식 
 void print_status(Mat_GraphType* g) {
 	printf("Disdtance: ");
 	for (int i = 0; i < g->n; i++)
@@ -83,7 +84,21 @@ void print_status(Mat_GraphType* g) {
 	}
 	printf("\n\n");
 }
+//리스트 방식
+void print_status1(List_GraphType* g) {
+	printf("Disdtance: ");
+	for (int i = 0; i < g->n; i++)
+	{
+		if (distance[i] != INF) {
+			printf("%d ", distance[i]);
+		}
+		else {
+			printf("* ");
+		}
 
+	}
+	printf("\n\n");
+}
 // 최소거리 구하기
 void shortest_path(Mat_GraphType* g, int start)
 {
@@ -101,7 +116,7 @@ void shortest_path(Mat_GraphType* g, int start)
 	mat_j++;
 	for (i = 0; i < g->n - 1; i++) {
 		print_status(g);
-		u = mat_choose(distance, g->n, found); // min값 확인
+		u = choose(distance, g->n, found); // min값 확인
 		
 		found[u] = TRUE;  // 최소거리 정점 방문표시
 		for (w = 0; w < g->n; w++) {  //최소거리 업데이트를 하기위한 반복
@@ -128,7 +143,7 @@ void list_shortest_path(List_GraphType* g, int start) {
 	distance[start] = 0;    // 시작 정점의 거리는 0으로 설정
 
 	for (i = 0; i < g->n; i++) {
-		u = list_choose(distance, g->n, found);  // 아직 방문하지 않은 정점 중 최단 거리를 가진 정점 선택
+		u = choose1(distance, g->n, found);  // 아직 방문하지 않은 정점 중 최단 거리를 가진 정점 선택
 
 		EdgeNode* current = g->adj_list[u];  // 선택한 정점에 대한 인접 리스트의 첫 번째 노드를 얻음
 		while (current != NULL) {
@@ -141,7 +156,7 @@ void list_shortest_path(List_GraphType* g, int start) {
 		found[u] = TRUE;  // 최소 거리를 가진 정점을 방문했음을 표시
 		list[list_j] = u + 1;  // 최소 거리를 가진 정점을 리스트에 추가
 		list_j++;
-		print_status(g);  // 현재까지의 최단 거리 상태를 출력
+		print_status1(g);  // 현재까지의 최단 거리 상태를 출력
 	}
 
 	for (int j = 0; j < g->n; j++)
