@@ -1,3 +1,4 @@
+/*
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -49,8 +50,8 @@ int choose(int distance[], int n, int found[]) {
 			minpos = i;
 		}
 
-	mat[mat_j] = minpos + 1;  // 최단 거리를 가진 정점의 인덱스를 배열에 저장
-	mat_j++;
+	mat[mat_j++] = minpos + 1;  // 최단 거리를 가진 정점의 인덱스를 배열에 저장
+
 
 	return minpos;  // 최단 거리를 가진 정점의 인덱스 반환
 }
@@ -112,8 +113,7 @@ void shortest_path(Mat_GraphType* g, int start)
 	}
 	found[start] = TRUE;    // 시작 정점 방문 표시 
 	distance[start] = 0;      // 시작 정점 거리 0
-	mat[mat_j] = start + 1;
-	mat_j++;
+	mat[mat_j++] = start + 1;
 	for (i = 0; i < g->n - 1; i++) {
 		print_status(g);
 		u = choose(distance, g->n, found); // min값 확인
@@ -154,8 +154,7 @@ void list_shortest_path(List_GraphType* g, int start) {
 			current = current->next;  // 다음 인접 정점으로 이동
 		}
 		found[u] = TRUE;  // 최소 거리를 가진 정점을 방문했음을 표시
-		list[list_j] = u + 1;  // 최소 거리를 가진 정점을 리스트에 추가
-		list_j++;
+		list[list_j++] = u + 1;  // 최소 거리를 가진 정점을 리스트에 추가
 		print_status1(g);  // 현재까지의 최단 거리 상태를 출력
 	}
 
@@ -227,5 +226,195 @@ int main(void)
 
 	list_shortest_path(&g1, 0);
 	
+	return 0;
+}
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define TRUE 1
+#define FALSE 0
+#define MAX_VERTICES 100	
+#define INF 1000000	// 무한대 (연결이 없는 경우) 
+
+
+int distance[MAX_VERTICES]; // 시작정점으로부터의 최단경로 거리 
+int found[MAX_VERTICES];		// 방문한 정점 표시 
+
+int list[MAX_VERTICES]; // 리스트방식 탐색 성공 순서를 저장할 리스트
+ 
+int j = 0;   //리스트방식 리스트 인댁스 
+
+// 간선을 나타내는 구조체
+typedef struct EdgeNode {
+	int dest; // 목적지 정점
+	int weight; // 가중치
+	struct EdgeNode* next; // 다음 간선을 가리키는 포인터
+} EdgeNode;
+
+// 인접 리스트 방식 그래프
+typedef struct GraphType {
+	int n; // 정점의 개수
+	EdgeNode* adj_list[MAX_VERTICES]; // 각 정점의 인접 리스트를 나타내는 배열
+} List_GraphType;
+
+typedef struct {
+	int vertex;
+	int distance;
+} HeapNode;
+
+// 최소 힙 구조체
+typedef struct {
+	HeapNode heap[MAX_VERTICES];
+	int size;
+} MinHeap;
+
+MinHeap min_heap;
+
+// 최소 힙 초기화
+void init_heap() {
+	min_heap.size = 0;
+}
+
+// 최소 힙에 노드 삽입
+void insert_heap(int vertex, int distance) {
+	int i = ++min_heap.size;
+
+	while (i != 1 && distance < min_heap.heap[i / 2].distance) {
+		min_heap.heap[i] = min_heap.heap[i / 2];
+		i /= 2;
+	}
+
+	min_heap.heap[i].vertex = vertex;
+	min_heap.heap[i].distance = distance;
+}
+
+// 최소 힙에서 노드 추출
+HeapNode delete_heap() {
+	int parent, child;
+	HeapNode min_element, last_element;
+
+	min_element = min_heap.heap[1];
+	last_element = min_heap.heap[min_heap.size--];
+
+	parent = 1;
+	child = 2;
+
+	while (child <= min_heap.size) {
+		if (child < min_heap.size && min_heap.heap[child].distance > min_heap.heap[child + 1].distance)
+			child++;
+
+		if (last_element.distance <= min_heap.heap[child].distance)
+			break;
+
+		min_heap.heap[parent] = min_heap.heap[child];
+		parent = child;
+		child *= 2;
+	}
+
+	min_heap.heap[parent] = last_element;
+
+	return min_element;
+}
+
+//리스트방식
+void print_status1(List_GraphType* g) {
+	printf("Distance: ");
+	for (int i = 0; i < g->n; i++)
+	{
+		if (distance[i] != INF) {
+			printf("%d ", distance[i]);
+		}
+		else {
+			printf("* ");
+		}
+	}
+	printf("\n\n");
+}
+
+// 인접 리스트 방식 그래프에서 시작 정점부터의 최단 경로를 찾는 함수
+void list_shortest_path(List_GraphType* g, int start) {
+	printf("인접 리스트 방식(heap)\n");  // 현재 사용 중인 방식을 출력
+	int i, u, w;
+	for (i = 0; i < g->n; i++) {
+		distance[i] = INF;  // 시작 정점으로부터의 거리를 무한대로 초기화
+		found[i] = FALSE;   // 아직 방문하지 않음을 표시
+	}
+	distance[start] = 0;    // 시작 정점의 거리는 0으로 설정
+
+	for (i = 0; i < g->n ; i++) {
+		u = delete_heap().vertex;  // 아직 방문하지 않은 정점 중 최단 거리를 가진 정점 선택
+		list[j++] = u +1;  // 최소 거리를 가진 정점을 리스트에 추가
+		EdgeNode* current = g->adj_list[u];  // 선택한 정점에 대한 인접 리스트의 첫 번째 노드를 얻음
+		while (current != NULL) {
+			w = current->dest;  // 현재 간선의 목적지 정점
+			if (!found[w]) {
+				if (distance[u] + current->weight < distance[w]) {
+					distance[w] = distance[u] + current->weight;  // 최단 경로 업데이트
+					insert_heap(w, distance[w]);  // 업데이트된 거리를 최소 힙에 추가
+					found[w] = TRUE;  // 최소 거리를 가진 정점을 방문했음을 표시
+				}
+			}
+			current = current->next;  // 다음 인접 정점으로 이동
+		}
+	
+
+		print_status1(g);  // 현재까지의 최단 거리 상태를 출력
+	}
+
+	for (int j = 0; j < g->n; j++)
+		printf("%d ", list[j]);
+}
+
+// 그래프 초기화 함수
+void init_graph(List_GraphType* g, int n) {
+	g->n = n;
+	for (int i = 0; i < n; i++) {
+		g->adj_list[i] = NULL;
+	}
+}
+
+// 간선 추가 함수
+void add_edge(List_GraphType* g, int start, int end, int weight) {
+	EdgeNode* new_node = (EdgeNode*)malloc(sizeof(EdgeNode));
+	new_node->dest = end;
+	new_node->weight = weight;
+	new_node->next = g->adj_list[start];
+	g->adj_list[start] = new_node;
+}
+
+int main(void)
+{
+	List_GraphType g1;
+	init_graph(&g1, 10);
+
+	// 인접 리스트 방식 간선 추가
+	add_edge(&g1, 0, 1, 3);
+	add_edge(&g1, 0, 5, 11);
+	add_edge(&g1, 0, 6, 12);
+	add_edge(&g1, 1, 2, 5);
+	add_edge(&g1, 1, 3, 4);
+	add_edge(&g1, 1, 4, 1);
+	add_edge(&g1, 1, 5, 7);
+	add_edge(&g1, 1, 6, 8);
+	add_edge(&g1, 2, 3, 2);
+	add_edge(&g1, 2, 6, 6);
+	add_edge(&g1, 2, 7, 5);
+	add_edge(&g1, 3, 4, 13);
+	add_edge(&g1, 3, 7, 14);
+	add_edge(&g1, 3, 9, 16);
+	add_edge(&g1, 4, 5, 9);
+	add_edge(&g1, 4, 8, 18);
+	add_edge(&g1, 4, 9, 17);
+	add_edge(&g1, 6, 7, 13);
+	add_edge(&g1, 7, 9, 15);
+	add_edge(&g1, 8, 9, 10);
+
+	init_heap();  // 최소 힙 초기화
+	insert_heap(0, 0);  // 시작 정점을 최소 힙에 추가
+	list_shortest_path(&g1, 0);
+
 	return 0;
 }
