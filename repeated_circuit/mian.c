@@ -319,11 +319,10 @@ HeapNode delete_heap() {
 	return min_element;
 }
 
-//리스트방식
+// 리스트방식
 void print_status1(List_GraphType* g) {
 	printf("Distance: ");
-	for (int i = 0; i < g->n; i++)
-	{
+	for (int i = 0; i < g->n; i++) {
 		if (distance[i] != INF) {
 			printf("%d ", distance[i]);
 		}
@@ -343,29 +342,39 @@ void list_shortest_path(List_GraphType* g, int start) {
 		found[i] = FALSE;   // 아직 방문하지 않음을 표시
 	}
 	distance[start] = 0;    // 시작 정점의 거리는 0으로 설정
-
 	for (i = 0; i < g->n; i++) {
 		u = delete_heap().vertex;  // 아직 방문하지 않은 정점 중 최단 거리를 가진 정점 선택
-		list[j++] = u + 1;  // 최소 거리를 가진 정점을 리스트에 추가
 		EdgeNode* current = g->adj_list[u];  // 선택한 정점에 대한 인접 리스트의 첫 번째 노드를 얻음
+
+		if (found[u]) {
+			// 이미 방문한 노드인 경우 다시 delete_heap 호출
+			i--;
+			continue;
+		}
+
+		list[j++] = u + 1;  // 최소 거리를 가진 정점을 리스트에 추가
+		found[u] = TRUE;  // 최소 거리를 가진 정점을 방문했음을 표시
+
 		while (current != NULL) {
 			w = current->dest;  // 현재 간선의 목적지 정점
 			if (!found[w]) {
 				if (distance[u] + current->weight < distance[w]) {
 					distance[w] = distance[u] + current->weight;  // 최단 경로 업데이트
 					insert_heap(w, distance[w]);  // 업데이트된 거리를 최소 힙에 추가
-					found[w] = TRUE;  // 최소 거리를 가진 정점을 방문했음을 표시
 				}
 			}
+
 			current = current->next;  // 다음 인접 정점으로 이동
 		}
-
 
 		print_status1(g);  // 현재까지의 최단 거리 상태를 출력
 	}
 
-	for (int j = 0; j < g->n; j++)
-		printf("%d ", list[j]);
+
+	for (int i = 0; i < j; i++) {
+		printf("%d ", list[i]);
+	}
+	printf("\n\n");
 }
 
 // 그래프 초기화 함수
