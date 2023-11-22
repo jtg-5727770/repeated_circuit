@@ -19,7 +19,7 @@ void bubble_sort(int list[], int n)
 			if (list[j] > list[j + 1]) {
 				SWAP(list[j], list[j + 1], temp);
 				move_count += 1;
-				SWAP_count++;
+				SWAP_count = 1;
 			}
 			compare_count += 1;
 		}
@@ -60,6 +60,7 @@ void  main()
 
 		bubble_sort(list_O, 20);
 	}
+	printf("정렬이 완료 되었습니다.\n");
 	printf("이동 횟수 평균: %d\n", move_count / 20);
 	printf("비교 횟수 평균: %d", compare_count / 20);
 
