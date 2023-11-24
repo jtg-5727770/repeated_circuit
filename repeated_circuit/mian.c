@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define SWAP(x, y, t) ( (t)=(x), (x)=(y), (y)=(t) )
 
@@ -39,8 +40,9 @@ void bubble_sort(int list[], int n)
 
 void  main()
 {
+	srand(time(NULL)); // 난수 초기화
 	for (n1 = 0; n1 < 20; n1++) {
-		srand(time(NULL)); // 난수 초기화
+		
 		int list_O[20];
 		int random = 0; // 정수형 변수 선언
 		for (int i = 0; i < 20; i++) {
