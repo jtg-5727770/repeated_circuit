@@ -1,91 +1,128 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory.h>
+#include <time.h>
 
+# define MAX_SIZE 20
+int move_count = 0;     //이동횟수 카운트
+int compare_count = 0;  //비교횟수 카운트
+int n1;
 
-typedef struct TreeNode {
-	int data;
-	struct TreeNode* left, * right;
-} TreeNode;
+int sorted[MAX_SIZE]; // 추가 공간이 필요
+// i는 정렬된 왼쪽리스트에 대한 인덱스
+// j는 정렬된 오른쪽리스트에 대한 인덱스
+// k는 정렬될 리스트에 대한 인덱스
 
-#define SIZE 100
-int top = -1;
-TreeNode* stack[SIZE];
-
-// push 함수
-void push(TreeNode* p)
+//합병
+void merge(int list[], int left, int mid, int right)
 {
-	if (top < SIZE - 1)
-		stack[++top] = p;
-}
-// pop 함수
-TreeNode* pop()
-{
-	TreeNode* p = NULL;
-	if (top >= 0)
-		p = stack[top--];
-	return p;
-}
-// 전위 순회
-void preorder_iter(TreeNode* root)
-{
-	while (1) {
-		for (; root; root = root->left) {
-			push(root);
-			printf("%d ", root->data);
+	int i, j, k, l;
+	i = left; j = mid + 1; k = left;
+	// 분할 정렬된 list의 합병
+	while (i <= mid && j <= right) {
+		if (list[i] <= list[j]) {
+			sorted[k++] = list[i++];
+			compare_count++;
 		}
-		root = pop();
-		if (!root) break;
-		root = root->right;
+		else {
+			sorted[k++] = list[j++];
+			compare_count++;
+		}
+
+		move_count++;
+	}
+	if (i > mid) { 	// 남아 있는 레코드의 일괄 복사
+		for (l = j; l <= right; l++) {
+			sorted[k++] = list[l];
+			move_count++;
+		}
+
+	}
+	else { 	// 남아 있는 레코드의 일괄 복사
+		for (l = i; l <= mid; l++) {
+			sorted[k++] = list[l];
+			move_count++;
+		}
+
+	}
+
+	// 배열 sorted[]의 리스트를 배열 list[]로 복사
+	for (l = left; l <= right; l++)
+		list[l] = sorted[l];
+	if (n1 == 0) {
+
+		for (int i = 0; i < 20; i++) {
+			printf("%d ", list[i]);
+		}
+		printf("\n");
 	}
 }
-// 중위 순회
-void inorder_iter(TreeNode* root)
+
+//재귀 분할 
+void merge_sort1(int list[], int left, int right)
 {
-	while (1) {
-		for (; root; root = root->left)
-			push(root);
-		root = pop();
-		if (!root) break;
-		printf("%d ", root->data);
-		root = root->right;
+	int mid;
+	if (left < right)
+	{
+		//재귀
+		mid = (left + right) / 2;            // 리스트의 균등분할
+		merge_sort1(list, left, mid);     // 부분리스트 정렬
+		merge_sort1(list, mid + 1, right);//부분리스트 정렬
+
+		merge(list, left, mid, right);    // 합병
 	}
 }
-// 후위 순회
-void postorder_iter(TreeNode* root)
-{
+//반복 분할
+void merge_sort2(int list[], int left, int right) {
+	int mid;
+	int stack[MAX_SIZE]; // 스택
+	int top = -1;
 
+	stack[++top] = left;
+	stack[++top] = right;
+
+	while (top >= 0) {
+		right = stack[top--];
+		left = stack[top--];
+
+		if (left < right) {
+			mid = (left + right) / 2;
+
+			stack[++top] = left;
+			stack[++top] = mid;
+
+			stack[++top] = mid + 1;
+			stack[++top] = right;
+
+			merge(list, left, mid, right);
+		}
+	}
 }
-
-//링크 노드 값입력
-TreeNode n1 = { 4, NULL, NULL };
-TreeNode n2 = { 5, NULL, NULL };
-TreeNode n3 = { 3, &n1, &n2 };
-TreeNode n4 = { 6, NULL, NULL };
-TreeNode n5 = { 2, &n3, &n4 };
-TreeNode n6 = { 10, NULL, NULL };
-TreeNode n7 = { 11, NULL, NULL };
-TreeNode n8 = { 9, &n6, &n7 };
-TreeNode n9 = { 8, NULL, NULL };
-TreeNode n10 = { 7, &n9, &n8 };
-TreeNode n11 = { 1, &n5, &n10 };
-TreeNode* root = &n11;
-
 void  main()
 {
-	printf("[Linked Tree]\n");
-	
-	printf("1.전위 순회\n");
-	preorder_iter(root);
-	printf("\n\n");
-	
-	printf("2.중위 순회\n");
-	inorder_iter(root);
-	printf("\n\n");
+	srand(time(NULL)); // 난수 초기화
+	for (n1 = 0; n1 < 20; n1++) {
 
-	printf("3.후위 순회\n");
-	postorder_iter(root);
-	printf("\n\n");
-	
+		int list_O[20];
+		int random = 0; // 정수형 변수 선언
+		for (int i = 0; i < 20; i++) {
+			random = rand() % 100; // 난수 생성
+			list_O[i] = random;
+		}
+		if (n1 == 0) {
+			printf("초기 리스트\n");
+			for (int i = 0; i < 20; i++) {
+				printf("%d ", list_O[i]);
+			}
+			printf("\n\n합병 정렬\n");
+		}
+		// 재귀
+		//merge_sort1(list_O, 0, 19);
+		// 반복
+		merge_sort2(list_O, 0, 19);
+	}
+
+	printf("\n이동 횟수 평균: %d\n", move_count / 20);
+	printf("비교 횟수 평균: %d", compare_count / 20);
+
 	return 0;
 }
