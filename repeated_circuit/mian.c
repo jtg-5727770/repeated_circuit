@@ -19,21 +19,32 @@ void merge(int list[], int left, int mid, int right)
 	i = left; j = mid + 1; k = left;
 	// 분할 정렬된 list의 합병
 	while (i <= mid && j <= right) {
-		if (list[i] <= list[j]) sorted[k++] = list[i++];
-		else sorted[k++] = list[j++];
-		compare_count++;
+		if (list[i] <= list[j]) {
+			sorted[k++] = list[i++];
+			compare_count++;
+		}
+		else {
+			sorted[k++] = list[j++];
+			
+		}
+
 		move_count++;
 	}
 	if (i > mid) { 	// 남아 있는 레코드의 일괄 복사
-		for (l = j; l <= right; l++)
+		for (l = j; l <= right; l++) {
 			sorted[k++] = list[l];
-		move_count++;
+			move_count++;
+		}
+		compare_count++;
 	}
 	else { 	// 남아 있는 레코드의 일괄 복사
-		for (l = i; l <= mid; l++)
+		for (l = i; l <= mid; l++) {
 			sorted[k++] = list[l];
-		move_count++;
+			move_count++;
+		}
+		compare_count++;
 	}
+
 	// 배열 sorted[]의 리스트를 배열 list[]로 복사
 	for (l = left; l <= right; l++)
 		list[l] = sorted[l];
