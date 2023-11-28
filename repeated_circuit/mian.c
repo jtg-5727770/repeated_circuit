@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <time.h>
 
 # define MAX_SIZE 20
@@ -73,27 +74,15 @@ void merge_sort1(int list[], int left, int right)
 }
 //반복 분할
 void merge_sort2(int list[], int left, int right) {
-	int mid;
-	int stack[MAX_SIZE]; // 스택
-	int top = -1;
+	int size, mid, end;
 
-	stack[++top] = left;
-	stack[++top] = right;
-
-	while (top >= 0) {
-		right = stack[top--];
-		left = stack[top--];
-
-		if (left < right) {
-			mid = (left + right) / 2;
-
-			stack[++top] = left;
-			stack[++top] = mid;
-
-			stack[++top] = mid + 1;
-			stack[++top] = right;
-
-			merge(list, left, mid, right);
+	for (size = 1; size <= right - left; size *= 2) {
+		for (mid = left; mid <= right - size; mid += 2 * size) {
+			end = mid + 2 * size - 1;
+			if (end > right) {
+				end = right;
+			}
+			merge(list, mid, mid + size - 1, end);
 		}
 	}
 }
