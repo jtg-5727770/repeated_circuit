@@ -25,7 +25,7 @@ void merge(int list[], int left, int mid, int right)
 		}
 		else {
 			sorted[k++] = list[j++];
-			
+			compare_count++;
 		}
 
 		move_count++;
@@ -35,14 +35,14 @@ void merge(int list[], int left, int mid, int right)
 			sorted[k++] = list[l];
 			move_count++;
 		}
-		compare_count++;
+	
 	}
 	else { 	// 남아 있는 레코드의 일괄 복사
 		for (l = i; l <= mid; l++) {
 			sorted[k++] = list[l];
 			move_count++;
 		}
-		compare_count++;
+
 	}
 
 	// 배열 sorted[]의 리스트를 배열 list[]로 복사
@@ -57,15 +57,27 @@ void merge(int list[], int left, int mid, int right)
 	}
 }
 
-//분할
+//분할 
 void merge_sort(int list[], int left, int right)
 {
 	int mid;
 	if (left < right)
-	{
-		mid = (left + right) / 2;              // 리스트의 균등분할
+	{    
+		//재귀
+		mid = (left + right) / 2;            // 리스트의 균등분할
 		merge_sort(list, left, mid);     // 부분리스트 정렬
 		merge_sort(list, mid + 1, right);//부분리스트 정렬
+		
+		/*
+		//반복
+		mid = (left + right) / 2;
+		for (int i = 0; mid == left + 1; i++) {
+			mid = (left + mid) / 2;
+		}
+		for (int i = 0; mid+1 == right + 1; i++) {
+			mid = (mid+1 + right) / 2;
+		}
+		*/
 		merge(list, left, mid, right);    // 합병
 	}
 }
