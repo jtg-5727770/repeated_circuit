@@ -18,7 +18,9 @@ int partition(int list[], int left, int right)
 	low = left;
 	high = right + 1;
 	pivot = list[left];
+
 	do {
+		//low를 pivot와 비교
 		do {
 			low++;
 			compare_count++;
@@ -38,7 +40,6 @@ int partition(int list[], int left, int right)
 	SWAP(list[left], list[high], temp);
 	move_count++;
 	if (n1 == 0) {
-
 		for (int i = 0; i < 20; i++) {
 			printf("%d ", list[i]);
 
