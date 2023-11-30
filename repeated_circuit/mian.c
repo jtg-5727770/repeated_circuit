@@ -9,7 +9,7 @@ double move_count = 0;     //이동횟수 카운트
 double compare_count = 0;  //비교횟수 카운트
 int n1;
 
-//분할
+//정렬
 int partition(int list[], int left, int right)
 {
 	int pivot, temp;
@@ -21,12 +21,14 @@ int partition(int list[], int left, int right)
 	do {
 		do {
 			low++;
-			//compare_count++;
+			compare_count++;
 		} while (low <= right && list[low] < pivot);
+
 		do {
 			high--;
 			compare_count++;
 		} while (high >= left && list[high] > pivot);
+
 		if (low < high) {
 			SWAP(list[low], list[high], temp);
 			move_count++;
@@ -46,16 +48,15 @@ int partition(int list[], int left, int right)
 	
 	return high;
 }
-// 퀵 정렬
+// 분할
 void quick_sort(int list[], int left, int right)
-{
+{	
 	if (left < right) {
 		int q = partition(list, left, right);
 		quick_sort(list, left, q - 1);
 		quick_sort(list, q + 1, right);
 	}
 }
-
 
 void  main()
 {
