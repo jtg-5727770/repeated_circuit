@@ -1,91 +1,124 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory.h>
+#include <time.h>
 
+#define SWAP(x, y, t) ( (t)=(x), (x)=(y), (y)=(t) )
+#define MAX_SIZE 20
 
-typedef struct TreeNode {
-	int data;
-	struct TreeNode* left, * right;
-} TreeNode;
+double move_count = 0;     // 이동횟수 카운트
+double compare_count = 0;  // 비교횟수 카운트
+int n1;
 
-#define SIZE 100
-int top = -1;
-TreeNode* stack[SIZE];
+typedef struct {
+    int left;
+    int right;
+} StackItem;
 
-// push 함수
-void push(TreeNode* p)
-{
-	if (top < SIZE - 1)
-		stack[++top] = p;
-}
-// pop 함수
-TreeNode* pop()
-{
-	TreeNode* p = NULL;
-	if (top >= 0)
-		p = stack[top--];
-	return p;
-}
-// 전위 순회
-void preorder_iter(TreeNode* root)
-{
-	while (1) {
-		for (; root; root = root->left) {
-			push(root);
-			printf("%d ", root->data);
-		}
-		root = pop();
-		if (!root) break;
-		root = root->right;
-	}
-}
-// 중위 순회
-void inorder_iter(TreeNode* root)
-{
-	while (1) {
-		for (; root; root = root->left)
-			push(root);
-		root = pop();
-		if (!root) break;
-		printf("%d ", root->data);
-		root = root->right;
-	}
-}
-// 후위 순회
-void postorder_iter(TreeNode* root)
-{
-
+void push(StackItem stack[], int* top, int left, int right) {
+    stack[++(*top)].left = left;
+    stack[(*top)].right = right;
 }
 
-//링크 노드 값입력
-TreeNode n1 = { 4, NULL, NULL };
-TreeNode n2 = { 5, NULL, NULL };
-TreeNode n3 = { 3, &n1, &n2 };
-TreeNode n4 = { 6, NULL, NULL };
-TreeNode n5 = { 2, &n3, &n4 };
-TreeNode n6 = { 10, NULL, NULL };
-TreeNode n7 = { 11, NULL, NULL };
-TreeNode n8 = { 9, &n6, &n7 };
-TreeNode n9 = { 8, NULL, NULL };
-TreeNode n10 = { 7, &n9, &n8 };
-TreeNode n11 = { 1, &n5, &n10 };
-TreeNode* root = &n11;
+void pop(int* top) {
+    (*top)--;
+}
 
-void  main()
+int partition(int list[], int left, int right) {
+    int pivot, temp;
+    int low, high;
+
+    low = left;
+    high = right + 1;
+    pivot = list[left];
+
+    do {
+        do {
+            low++;
+            compare_count++;
+        } while (low <= right && list[low] < pivot);
+
+        do {
+            high--;
+            compare_count++;
+        } while (high >= left && list[high] > pivot);
+
+        if (low < high) {
+            SWAP(list[low], list[high], temp);
+            move_count++;
+        }
+    } while (low < high);
+
+    SWAP(list[left], list[high], temp);
+    move_count++;
+    if (n1 == 0) {
+        for (int i = 0; i < 20; i++) {
+            printf("%d ", list[i]);
+
+        }
+        printf("\n");
+    }
+    return high;
+}
+//재귀
+void quick_sort1(int list[], int left, int right)
 {
-	printf("[Linked Tree]\n");
-	
-	printf("1.전위 순회\n");
-	preorder_iter(root);
-	printf("\n\n");
-	
-	printf("2.중위 순회\n");
-	inorder_iter(root);
-	printf("\n\n");
+    if (left < right) {
+        int q = partition(list, left, right);
+        quick_sort1(list, left, q - 1);
+        quick_sort1(list, q + 1, right);
+    }
+}
+//반복
+void quick_sort2(int list[], int left, int right) {
+    int top = -1;
+    StackItem stack[MAX_SIZE];
+    push(stack, &top, left, right);
 
-	printf("3.후위 순회\n");
-	postorder_iter(root);
-	printf("\n\n");
-	
-	return 0;
+    while (top != -1) {
+        left = stack[top].left;
+        right = stack[top].right;
+        pop(&top);
+
+        int q = partition(list, left, right);
+
+        if (left < q - 1) {
+            push(stack, &top, left, q - 1);
+        }
+
+        if (q + 1 < right) {
+            push(stack, &top, q + 1, right);
+        }
+    }
+}
+
+int main() {
+    srand(time(NULL)); // 난수 초기화
+    int n = MAX_SIZE;
+
+    for (n1 = 0; n1 < 20; n1++) {
+        int list_O[20];
+        int random = 0;
+
+        for (int i = 0; i < 20; i++) {
+            random = rand() % 100;
+            list_O[i] = random;
+        }
+
+        if (n1 == 0) {
+            printf("초기 리스트\n");
+            for (int i = 0; i < 20; i++) {
+                printf("%d ", list_O[i]);
+            }
+            printf("\n\n퀵 정렬\n");
+        }
+        //재귀
+        //quick_sort1(list_O, 0, n - 1);
+        //반복
+        quick_sort2(list_O, 0, n - 1);
+    }
+
+    printf("\n이동 횟수 평균: %f\n", move_count / 20);
+    printf("비교 횟수 평균: %f", compare_count / 20);
+
+    return 0;
 }
