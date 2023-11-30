@@ -13,6 +13,32 @@ int sorted[MAX_SIZE]; // 추가 공간이 필요
 // j는 정렬된 오른쪽리스트에 대한 인덱스
 // k는 정렬될 리스트에 대한 인덱스
 
+typedef struct {
+	int left;
+	int right;
+} StackNode;
+
+void push(StackNode stack[], int* top, int left, int right) {
+	if (*top < MAX_SIZE - 1) {
+		stack[++(*top)].left = left;
+		stack[*top].right = right;
+	}
+	else {
+		printf("Stack Overflow\n");
+		exit(EXIT_FAILURE);
+	}
+}
+
+void pop(int* top) {
+	if (*top >= 0) {
+		(*top)--;
+	}
+	else {
+		printf("Stack Underflow\n");
+		exit(EXIT_FAILURE);
+	}
+}
+
 //합병
 void merge(int list[], int left, int mid, int right)
 {
@@ -72,20 +98,30 @@ void merge_sort1(int list[], int left, int right)
 		merge(list, left, mid, right);    // 합병
 	}
 }
-//반복 분할
-void merge_sort2(int list[], int left, int right) {
-	int size, mid, end;
+//반복
+void merge_sort2(int list[], int size)
+{
+	StackNode stack[MAX_SIZE];
+	int top = -1;
 
-	for (size = 1; size <= right - left; size *= 2) {
-		for (mid = left; mid <= right - size; mid += 2 * size) {
-			end = mid + 2 * size - 1;
-			if (end > right) {
-				end = right;
-			}
-			merge(list, mid, mid + size - 1, end);
+	push(stack, &top, 0, size - 1);
+
+	while (top >= 0) {
+		int left = stack[top].left;
+		int right = stack[top].right;
+		pop(&top);
+
+		if (left < right) {
+			int mid = (left + right) / 2;
+
+			push(stack, &top, left, mid);
+			push(stack, &top, mid + 1, right);
+
+			merge(list, left, mid, right);
 		}
 	}
 }
+
 void  main()
 {
 	srand(time(NULL)); // 난수 초기화
@@ -106,8 +142,7 @@ void  main()
 		}
 		// 재귀
 		//merge_sort1(list_O, 0, 19);
-		// 반복
-		merge_sort2(list_O, 0, 19);
+		merge_sort2(list_O, 20);
 	}
 
 	printf("\n이동 횟수 평균: %d\n", move_count / 20);
