@@ -22,7 +22,7 @@ void push(StackItem stack[], int* top, int left, int right) {
 void pop(int* top) {
     (*top)--;
 }
-
+//Á¤·Ä
 int partition(int list[], int left, int right) {
     int pivot, temp;
     int low, high;
