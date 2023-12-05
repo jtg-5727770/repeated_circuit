@@ -32,32 +32,38 @@ int partition(int list[], int left, int right) {
     pivot = list[left];
 
     do {
+        // pivot보다 작은 값을 찾을 때까지 low를 이동
         do {
             low++;
             compare_count++;
         } while (low <= right && list[low] < pivot);
 
+        // pivot보다 큰 값을 찾을 때까지 high를 이동
         do {
             high--;
             compare_count++;
         } while (high >= left && list[high] > pivot);
 
+        // low와 high가 교차하지 않았다면 교환
         if (low < high) {
             SWAP(list[low], list[high], temp);
             move_count++;
         }
     } while (low < high);
 
+    // pivot을 중간으로 이동
     SWAP(list[left], list[high], temp);
     move_count++;
+
+    // 정렬 상태 출력 (n1이 0일 때만 출력)
     if (n1 == 0) {
         for (int i = 0; i < 20; i++) {
             printf("%d ", list[i]);
-
         }
         printf("\n");
     }
-    return high;
+
+    return high; // 중간 위치의 인덱스를 반환
 }
 //재귀
 void quick_sort1(int list[], int left, int right)
